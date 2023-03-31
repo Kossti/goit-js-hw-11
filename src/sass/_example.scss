@@ -26,3 +26,168 @@
   background-size: cover;
   background-position: center;
 }
+
+// SEARCH BOX
+body {
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/41294/hero.jpg)
+    no-repeat center center fixed;
+  background-size: cover;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.form-btn {
+  background-color: #c6d1df;
+  border: none;
+  margin: 0;
+  padding: 7px;
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
+  transition: background-color 500ms linear;
+}
+
+.form-input {
+  margin: 0;
+  padding: 10px 20px;
+  width: 25%;
+  border: none;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  font-size: 20px;
+}
+
+.icon {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  stroke-width: 0;
+  fill: #1360c1;
+}
+
+.load-more {
+  display: none;
+  margin: 20px auto;
+  background-color: #1360c1;
+  border: none;
+  border-radius: 10px;
+  width: 160px;
+  color: #ffffff;
+  height: 50px;
+  font-size: 20px;
+}
+
+.gallery {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 1300px;
+  margin: 15px auto;
+  gap: 15px;
+}
+
+.photo-card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 182px;
+}
+
+.photo-card {
+  width: 300px;
+}
+
+// SEARCH BEGINS
+.search-form {
+  width: 500px;
+  height: 40px;
+  margin: 20px auto;
+  background: #444;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  border: 1px solid #fff;
+
+  input {
+    width: 370px;
+    padding: 10px 5px;
+    float: left;
+    color: #ccc;
+    border: 0;
+    background: transparent;
+    border-radius: 3px 0 0 3px;
+    &:focus {
+      outline: 0;
+      background: transparent;
+    }
+  }
+
+  button {
+    position: relative;
+    float: right;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    height: 40px;
+    width: 120px;
+    color: #fff;
+    background: transparent;
+    border-left: 1px solid #fff;
+    border-radius: 0 3px 3px 0;
+    &:hover {
+      background: #fff;
+      color: #444;
+    }
+    &:active {
+      box-shadow: 0px 0px 12px 0px rgba(225, 225, 225, 1);
+    }
+    &:focus {
+      outline: 0;
+    }
+  }
+}
+
+button.load-more {
+  display: block;
+  margin: 0 auto;
+  // position: absolute;
+  // float: right;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  height: 40px;
+  width: 120px;
+  color: #fff;
+  background: transparent;
+  border-left: 0px solid #fff;
+  border-radius: 2px;
+  &:hover {
+    background: #fff;
+    color: #444;
+  }
+  &:active {
+    box-shadow: 0px 0px 12px 0px rgba(225, 225, 225, 1);
+  }
+  &:focus {
+    outline: 0;
+  }
+  .loading {
+    display: none;
+    position: absolute;
+    left: 1em;
+  }
+
+  &_loading {
+    .loading {
+      display: block;
+    }
+  }
+
+  &__btn_hidden {
+    visibility: hidden;
+  }
+}
+// SEARCH ENDS
