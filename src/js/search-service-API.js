@@ -1,5 +1,5 @@
-// import axios from 'axios';
-// const searchQ = event.currentTarget.elements.searchQuery.value;
+import axios from 'axios';
+
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '34786685-cbc85d9ed4d6781cc6b7aa9bf';
 
@@ -22,10 +22,7 @@ class ApiSearchImageService {
 
     return fetch(`${BASE_URL}?key=${API_KEY}&${searchParams}`)
       .then(response => response.json())
-      .then(({ hits }) => hits)
-      .catch(error => {
-        console.error(error);
-      });
+      .then(({ hits }) => hits);
   }
 }
 export default new ApiSearchImageService();

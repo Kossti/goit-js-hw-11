@@ -2,7 +2,8 @@ import notifier from './notifier';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-// import { formToJSON } from 'axios';
+import { formToJSON } from 'axios';
+import axios from 'axios';
 import apiSearchImageService from './search-service-API';
 
 class ImageBox {
@@ -53,50 +54,87 @@ class ImageBox {
     }
   }
 
-  #onSearchForm(event) {
+  async #onSearchForm(event) {
     event.preventDefault();
-
     this.#searchQ = event.currentTarget.elements.searchQuery.value;
+    const images = await this.#fetchImages();
 
-    this.#fetchImages().finally(() => {
-      event.target.reset();
-    });
-    this.#galleryCards.innerHTML = '';
+    if (images.length > 0) {
+      this.#updateImages(images);
+    } else {
+      return notifier.error(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    event.target.reset();
+
+    // =====
+    // this.#fetchImages()
+    //   .then(images => {
+    //     if (images.length === 0) {
+    //       return notifier.error(
+    //         'Sorry, there are no images matching your search query. Please try again.'
+    //       );
+    //     }
+    //     this.#updateImages(images);
+    //   })
+    //   .finally(() => {
+    //     event.target.reset();
+    //   });
+    // this.#galleryCards.innerHTML = '';
   }
 
-  #fetchImages() {
-    return (
-      apiSearchImageService
-        .fetchData(this.#searchQ)
-        .then(images => {
-          this.#updateImages(images);
-          if (images.length === 0) {
-            return notifier.error(
-              'Sorry, there are no images matching your search query. Please try again.'
-            );
-          }
-        })
-        // .then(images => {
-        //   this.#updateImages(images);
-        // })
-        .catch(error => {
-          console.error(error);
-          notifier.error(
-            "We're sorry, but you've reached the end of search results."
-          );
-        })
-    );
+  async #fetchImages() {
+    try {
+      return await apiSearchImageService.fetchData(this.#searchQ);
+    } catch (error) {
+      console.error(error);
+      notifier.error(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+    // ======
+    // return apiSearchImageService
+    //   .fetchData(this.#searchQ)
+    //   .then(images => images)
+    //   .catch(error => {
+    //     console.error(error);
+    //     notifier.error(
+    //       "We're sorry, but you've reached the end of search results."
+    //     );
+    //   });
   }
 
-  #onClickLoadMoreBtn() {
+  async #loadMore() {
+    const images = await this.#fetchImages();
+    // this.#updateImages(images);
+    this.#updateImages([...this.#images, ...images]);
+    if (images.length === 0) {
+      return notifier.error(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    // ====
+    // return this.#fetchImages().then(images => {
+    //   this.#updateImages([...this.#images, ...images]);
+    // });
+  }
+
+  async #onClickLoadMoreBtn() {
     // this.#buttonLoadMore.classList.add('load-more__btn_loading');
     this.#buttonLoadMore.classList.add('load-more__btn_hidden');
     this.#buttonLoadMore.disabled = true;
-    this.#fetchImages().finally(() => {
-      // this.#buttonLoadMore.classList.remove('load-more__btn_loading');
-      this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
-      this.#buttonLoadMore.disabled = false;
-    });
+
+    await this.#loadMore();
+    this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
+    this.#buttonLoadMore.disabled = false;
+
+    // ========
+    // this.#loadMore().finally(() => {
+    //   // this.#buttonLoadMore.classList.remove('load-more__btn_loading');
+    //   this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
+    //   this.#buttonLoadMore.disabled = false;
+    // });
   }
 
   #toggleMoreButton() {
@@ -104,9 +142,6 @@ class ImageBox {
       this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
     } else {
       this.#buttonLoadMore.classList.add('load-more__btn_hidden');
-      // return notifier.info(
-      //   "We're sorry, but you've reached the end of search results."
-      // );
     }
   }
 
@@ -115,7 +150,7 @@ class ImageBox {
       entries => {
         for (const entry of entries) {
           if (entry.isIntersecting && this.#images.length > 0) {
-            this.#onClickLoadMoreBtn();
+            this.#loadMore();
           }
         }
       },
@@ -152,7 +187,8 @@ class ImageBox {
         }
       )
       .join('');
-    this.#galleryCards.insertAdjacentHTML('beforeend', mockup);
+    // this.#galleryCards.insertAdjacentHTML('beforeend', mockup);
+    this.#galleryCards.innerHTML = mockup;
     lightbox.refresh();
   }
 }
