@@ -87,7 +87,7 @@ class ImageBox {
     const images = await this.#fetchImages();
     this.#updateImages([...this.#images, ...images]);
 
-    console.log(images.length);
+    // console.log(images.length);
     if (images.length === 0) {
       this.#buttonLoadMore.classList.add('load-more__btn_hidden');
       // this.#buttonLoadMore.disabled = true;
