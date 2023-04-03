@@ -25,4 +25,5 @@ class ApiSearchImageService {
       .then(({ hits }) => hits);
   }
 }
+
 export default new ApiSearchImageService();

@@ -1,10 +1,10 @@
-import notifier from './notifier';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { formToJSON } from 'axios';
 import axios from 'axios';
 import apiSearchImageService from './search-service-API';
+import { Loading } from 'notiflix';
 
 class ImageBox {
   #targetElement = null;
@@ -15,6 +15,8 @@ class ImageBox {
   #searchQ = null;
   #galleryCards = {};
   #images = [];
+  #totalHits = [];
+  // #hits = [];
 
   constructor({ targetElement, infinityLoading = false } = {}) {
     this.#targetElement = targetElement || document.body;
@@ -47,6 +49,10 @@ class ImageBox {
     this.#images = images;
     this.#render();
 
+    if (!this.#loadMore) {
+      this.#toggleMoreButton();
+    }
+
     if (!this.#infinityLoading) {
       this.#toggleMoreButton();
     } else {
@@ -62,26 +68,12 @@ class ImageBox {
     if (images.length > 0) {
       this.#updateImages(images);
     } else {
-      return notifier.error(
+      return Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
-    event.target.reset();
 
-    // =====
-    // this.#fetchImages()
-    //   .then(images => {
-    //     if (images.length === 0) {
-    //       return notifier.error(
-    //         'Sorry, there are no images matching your search query. Please try again.'
-    //       );
-    //     }
-    //     this.#updateImages(images);
-    //   })
-    //   .finally(() => {
-    //     event.target.reset();
-    //   });
-    // this.#galleryCards.innerHTML = '';
+    event.target.reset();
   }
 
   async #fetchImages() {
@@ -89,52 +81,69 @@ class ImageBox {
       return await apiSearchImageService.fetchData(this.#searchQ);
     } catch (error) {
       console.error(error);
-      notifier.error(
-        "We're sorry, but you've reached the end of search results."
-      );
-    }
-    // ======
-    // return apiSearchImageService
-    //   .fetchData(this.#searchQ)
-    //   .then(images => images)
-    //   .catch(error => {
-    //     console.error(error);
-    //     notifier.error(
-    //       "We're sorry, but you've reached the end of search results."
-    //     );
-    //   });
-  }
-
-  async #loadMore() {
-    const images = await this.#fetchImages();
-    // this.#updateImages(images);
-    this.#updateImages([...this.#images, ...images]);
-    if (images.length === 0) {
-      return notifier.error(
+      Notify.info(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
-    // ====
-    // return this.#fetchImages().then(images => {
-    //   this.#updateImages([...this.#images, ...images]);
-    // });
+  }
+
+  // #ifNotFoundConten() {
+  //   if (images.length < 40) {
+  //     this.#offLoadMore();
+  //   } else {
+  //     // this.#loadMore();
+  //   }
+  // }
+
+  // #offLoadMore() {
+  //   this.#buttonLoadMore.classList.add('load-more__btn_hidden');
+  //   this.#buttonLoadMore.disabled = true;
+  //   return Notify.info(
+  //     "We're sorry, but you've reached the end of search results."
+  //   );
+  // }
+
+  async #loadMore() {
+    const images = await this.#fetchImages();
+    this.#updateImages([...this.#images, ...images]);
+
+    // const totalHits = await this.data.totalHits;
+
+    if (images.length === 0) {
+      this.#buttonLoadMore.classList.add('load-more__btn_hidden');
+      this.#buttonLoadMore.disabled = true;
+      return Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+
+    // function onLoadMore() {
+    // try {
+    //   apiSearchImageService.fetchData().then(({ hits, total, totalHits }) => {
+    //     let totalPages = Math.ceil(totalHits / apiSearchImageService.per_page);
+
+    //     console.log(apiSearchImageService.page);
+    //     console.log(totalPages);
+    //     if (totalPages <= apiSearchImageService.page) {
+    //       buttonLoadMore.classList.add('load-more__btn_hidden');
+    //       Notify.Report.info(
+    //         'Were sorry, but youve reached the end of search results.'
+    //       );
+    //     }
+    //   });
+    // } catch (error) {
+    //   Notify.failure('Something went wrong. Please try again later.');
+    // }
+    // }
   }
 
   async #onClickLoadMoreBtn() {
-    // this.#buttonLoadMore.classList.add('load-more__btn_loading');
     this.#buttonLoadMore.classList.add('load-more__btn_hidden');
     this.#buttonLoadMore.disabled = true;
 
     await this.#loadMore();
     this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
     this.#buttonLoadMore.disabled = false;
-
-    // ========
-    // this.#loadMore().finally(() => {
-    //   // this.#buttonLoadMore.classList.remove('load-more__btn_loading');
-    //   this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
-    //   this.#buttonLoadMore.disabled = false;
-    // });
   }
 
   #toggleMoreButton() {
@@ -195,7 +204,7 @@ class ImageBox {
 
 // with infinity scroll:
 // const imageBox = new ImageBox({ infinityLoading: true });
-// with bitton load more:
+// with bittom load more:
 const imageBox = new ImageBox();
 imageBox.init();
 
