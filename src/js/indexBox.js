@@ -15,8 +15,6 @@ class ImageBox {
   #searchQ = null;
   #galleryCards = {};
   #images = [];
-  #totalHits = [];
-  // #hits = [];
 
   constructor({ targetElement, infinityLoading = false } = {}) {
     this.#targetElement = targetElement || document.body;
@@ -55,8 +53,6 @@ class ImageBox {
 
     if (!this.#infinityLoading) {
       this.#toggleMoreButton();
-    } else {
-      this.#toggleMoreButton();
     }
   }
 
@@ -87,63 +83,25 @@ class ImageBox {
     }
   }
 
-  // #ifNotFoundConten() {
-  //   if (images.length < 40) {
-  //     this.#offLoadMore();
-  //   } else {
-  //     // this.#loadMore();
-  //   }
-  // }
-
-  // #offLoadMore() {
-  //   this.#buttonLoadMore.classList.add('load-more__btn_hidden');
-  //   this.#buttonLoadMore.disabled = true;
-  //   return Notify.info(
-  //     "We're sorry, but you've reached the end of search results."
-  //   );
-  // }
-
   async #loadMore() {
     const images = await this.#fetchImages();
     this.#updateImages([...this.#images, ...images]);
 
-    // const totalHits = await this.data.totalHits;
-
+    console.log(images.length);
     if (images.length === 0) {
       this.#buttonLoadMore.classList.add('load-more__btn_hidden');
-      this.#buttonLoadMore.disabled = true;
+      // this.#buttonLoadMore.disabled = true;
       return Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     }
-
-    // function onLoadMore() {
-    // try {
-    //   apiSearchImageService.fetchData().then(({ hits, total, totalHits }) => {
-    //     let totalPages = Math.ceil(totalHits / apiSearchImageService.per_page);
-
-    //     console.log(apiSearchImageService.page);
-    //     console.log(totalPages);
-    //     if (totalPages <= apiSearchImageService.page) {
-    //       buttonLoadMore.classList.add('load-more__btn_hidden');
-    //       Notify.Report.info(
-    //         'Were sorry, but youve reached the end of search results.'
-    //       );
-    //     }
-    //   });
-    // } catch (error) {
-    //   Notify.failure('Something went wrong. Please try again later.');
-    // }
-    // }
   }
 
   async #onClickLoadMoreBtn() {
     this.#buttonLoadMore.classList.add('load-more__btn_hidden');
-    this.#buttonLoadMore.disabled = true;
+    // this.#buttonLoadMore.disabled = true;
 
     await this.#loadMore();
-    this.#buttonLoadMore.classList.remove('load-more__btn_hidden');
-    this.#buttonLoadMore.disabled = false;
   }
 
   #toggleMoreButton() {
